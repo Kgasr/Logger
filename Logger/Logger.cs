@@ -26,16 +26,7 @@
         public async Task Log(LogLevel logLevel, string message, Exception? exception = null)
         {
             if (!IsEnabled(logLevel)) return;
-            string? logRecord;
-            if (exception == null)
-            {
-                logRecord = FormatLogRecord(logLevel, message, exception);
-            }
-            else
-            {
-                logRecord = FormatLogRecord(logLevel, message);
-            }
-            
+            string logRecord = FormatLogRecord(logLevel, message, exception);
             await _logDestination.WriteLogAsync(logRecord);
         }
 

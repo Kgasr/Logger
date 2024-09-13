@@ -6,7 +6,7 @@
 
         public FileLogDestination(string filePath)
         {
-            _filePath = filePath ?? Constants.DefaultLogDirectory + Constants.DefaultLogFile;
+            _filePath = filePath;
         }
 
         public async Task WriteLogAsync(string logRecord)
@@ -23,19 +23,14 @@
                     await writer.WriteLineAsync(logRecord);
                     return;
                 }
-                catch (IOException) when (attempt < maxRetries - 1)     
+                catch (IOException) when (attempt < maxRetries - 1)
                 {
                     await Task.Delay(retryDelay);                   // Wait before retrying
                 }
-                catch (Exception)                                   // Catch all other exceptions
+                catch (Exception ex)                                   // Catch all other exceptions
                 {
-                    string failedLogRecordPath = Path.Combine(
-                        Path.GetDirectoryName(_filePath) ?? Constants.DefaultLogDirectory ,
-                        Path.GetFileName(_filePath) == "" ? "Failed_log_record_" + Path.GetFileName(_filePath) : Constants.DefaultLogFile);
-
-                    using var streamWriter = new StreamWriter(failedLogRecordPath);
-                    await streamWriter.WriteLineAsync(logRecord);
-                    break;                                          // Exit loop if a non-recoverable exception occurs
+                    await Utils.LogDataWithExceptionAsync(logRecord, ex, nameof(FileLogDestination), _filePath);
+                    break;
                 }
             }
         }
