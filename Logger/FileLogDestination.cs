@@ -29,7 +29,7 @@
                 }
                 catch (Exception ex)                                   // Catch all other exceptions
                 {
-                    await Utils.LogDataWithExceptionAsync(logRecord, ex, nameof(FileLogDestination), _filePath);
+                    await Utils.LogDataWithExceptionAsync(logRecord, ex, nameof(FileLogDestination));
                     break;
                 }
             }
